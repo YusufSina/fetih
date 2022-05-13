@@ -11,33 +11,32 @@ function Introduction() {
         <div className="d-flex flex-column justify-content-center align-items-center">
 
           <div className="row py-5">
-            <div className="col-md-9">
+            <div className="col-md-6">
               <h2>Fetih Nedir?</h2>
               <p>&emsp;Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
             </div>
-            <div className="col-md-3">
-              <img src="https://picsum.photos/500" className="img-thumbnail" alt="information1" />
+            <div className="col-md-6">
+              <img src="https://picsum.photos/600" className="img-thumbnail mx-auto" alt="information1" />
             </div>
           </div>
 
           <div className="row py-5">
-            <div className="col-md-3">
-              <img src="https://picsum.photos/500" className="img-thumbnail" alt="information1" />
+            <div className="col-md-6">
+              <img src="https://picsum.photos/600" className="img-thumbnail mx-auto" alt="information1" />
             </div>
-            <div className="col-md-9">
+            <div className="col-md-6">
               <h2>Fetih Nedir?</h2>
               <p>&emsp;Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
             </div>
-
           </div>
 
           <div className="row py-5">
-            <div className="col-md-9">
+            <div className="col-md-6">
               <h2>Fetih Nedir?</h2>
               <p>&emsp;Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
             </div>
-            <div className="col-md-3">
-              <img src="https://picsum.photos/500" className="img-thumbnail" alt="information1" />
+            <div className="col-md-6">
+              <img src="https://picsum.photos/600" className="img-thumbnail mx-auto" alt="information1" />
             </div>
           </div>
         </div>
