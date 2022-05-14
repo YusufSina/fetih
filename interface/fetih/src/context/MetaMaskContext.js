@@ -23,7 +23,6 @@ function MetaMaskProvider({ children }) {
       window.location.reload();
     });
   };
-
   const connectMetaMask = async () => {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     if (accounts.length > 0) {
@@ -34,7 +33,7 @@ function MetaMaskProvider({ children }) {
   };
 
   useEffect(() => {
-    setIsMetaMaskInstalled(window.ethereum !== 'undefined');
+    setIsMetaMaskInstalled(window.ethereum !== undefined);
   }, []);
 
   useEffect(() => {
