@@ -9,7 +9,6 @@ function MetaMaskProvider({ children }) {
   const [isMetaMaskInstalled, setIsMetaMaskInstalled] = useState(false);
   const [account, setAccount] = useState('');
   const [chainId, setChainId] = useState('');
-  const [web3, setWeb3] = useState();
 
   const initMetaMask = () => {
     window.ethereum.on('connect', connectInfo => {
@@ -40,13 +39,12 @@ function MetaMaskProvider({ children }) {
 
   useEffect(() => {
     if (isMetaMaskInstalled) {
-      setWeb3(window.ethereum);
       initMetaMask();
     }
   }, [isMetaMaskInstalled]);
 
   return (
-    <MetaMaskContext.Provider value={{ isMetaMaskInstalled, connectMetaMask, account, chainId, web3 }}>
+    <MetaMaskContext.Provider value={{ isMetaMaskInstalled, connectMetaMask, account, chainId }}>
       {children}
     </MetaMaskContext.Provider>
   );
