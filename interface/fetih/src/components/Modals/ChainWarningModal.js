@@ -1,7 +1,7 @@
 import React from 'react';
 import Modal from 'react-bootstrap/Modal';
 
-function ChainWarning() {
+function ChainWarningModal() {
   return (
     <Modal
       show
@@ -15,7 +15,7 @@ function ChainWarning() {
       <Modal.Body>
         Oyunu oynayabilmek için lütfen
         {' '}
-        <b> Ropsten Test</b>
+        <b> Rinkeby Test</b>
         {' '}
         ağına bağlanın!
       </Modal.Body>
@@ -23,4 +23,4 @@ function ChainWarning() {
   );
 }
 
-export default ChainWarning;
+export default ChainWarningModal;
