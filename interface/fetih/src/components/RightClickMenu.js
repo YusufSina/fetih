@@ -8,10 +8,9 @@ import CityDetailModal from './Modals/CityDetailModal';
 import { LoadingHelper } from '../helpers/Utilities';
 import { Fetch } from './Fetch';
 import { MetaMaskContext } from '../context/MetaMaskContext';
-import Web3 from 'web3';
 
 function RightClickMenu({ id, top, left, show }) {
-  const { account } = useContext(MetaMaskContext);
+  const { battle, buyLand, produceSoldiers } = useContext(MetaMaskContext);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [cityDetail, setCityDetail] = useState({});
 
@@ -24,14 +23,6 @@ function RightClickMenu({ id, top, left, show }) {
         LoadingHelper.HideLoading();
       });
   };
-
-  const battle = async (attackerId, defenderId) => {
-    const web3 = new Web3(window.ethereum);
-
-    const contract = new web3.eth.Contract(FetihContract.ABI, FetihContract.ADDRESS);
-    await contract.methods.battle(attackerId, defenderId).send({ from: account });
-
-  }
 
   const renderAttackButton = () => {
     const neighborCityNames = NeighboringProvinces[id].map(_id => ({ name: document.getElementById(_id).getAttribute('name'), id: _id}));
@@ -56,6 +47,8 @@ function RightClickMenu({ id, top, left, show }) {
         style={{ top, left, position: 'absolute', display: show ? 'block' : 'none' }}
       >
         <Button className='rightClickContext-btn' onClick={() => onDetailClick()}>Detay</Button>
+        <Button className='rightClickContext-btn' onClick={() => buyLand(id)}>Satın Al</Button>
+        <Button className='rightClickContext-btn' onClick={() => produceSoldiers(id)}>Asker Üret</Button>
         {renderAttackButton()}
       </ButtonGroup>
       {

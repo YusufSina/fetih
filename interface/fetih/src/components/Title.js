@@ -30,7 +30,7 @@ function Title() {
               Cüzdan Bağla
             </Button>
           ) : (
-            <div style={{'font-size':'25px'}}>
+            <div style={{ fontSize: '25px' }}>
               <Badge pill bg="dark">
                 {shortenAccountAddress(account)}
               </Badge>

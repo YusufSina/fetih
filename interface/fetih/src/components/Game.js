@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { FetihContract } from '../helpers/Consts';
 import GameFooter from './GameFooter';
 import Map from './Map';
 import RightClickMenu from './RightClickMenu';
-import Web3 from 'web3';
 
 function Game() {
   const [showRightClickMenu, setShowRightClickMenu] = useState(false);
@@ -31,11 +29,6 @@ function Game() {
         setShowRightClickMenu(false);
       }
     });
-
-    const web3 = new Web3(window.ethereum);
-
-    const contract = new web3.eth.Contract(FetihContract.ABI, FetihContract.ADDRESS);
-    contract.methods.getAllOwners().call().then(result => console.log(result));
   }, []);
 
   return (
