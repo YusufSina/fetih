@@ -2,9 +2,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Web3 from 'web3';
 import PropTypes from 'prop-types';
-import { FetihContract } from '../helpers/Consts';
 import { toast } from 'react-toastify';
-
+import { FetihContract } from '../helpers/Consts';
 
 const MetaMaskContext = React.createContext();
 const MetaMaskConsumer = MetaMaskContext.Consumer;
@@ -35,58 +34,95 @@ function MetaMaskProvider({ children }) {
       setAccount('');
     }
   };
-  /******************************************* */
+  /** ***************************************** */
   /* Contract Functions */
   const battle = async (attackerId, defenderId) => {
     await contractRef.current.methods.battle(attackerId, defenderId).send({ from: account });
   };
 
-  const buyLand = async (landId) => {
+  const buyLand = async landId => {
     await contractRef.current.methods.buyCity(landId).send({ from: account, value: web3Ref.current.utils.toWei('0.1', 'ether') });
   };
 
-  const isTheBarrackBusy = async (landId) => {
-    return await contractRef.current.methods.isTheBarrackBusy(landId).call({ from: account });
+  const isTheBarrackBusy = async landId => {
+    const isBarrackBusy = await contractRef.current.methods.isTheBarrackBusy(landId).call({ from: account });
+    return isBarrackBusy;
   };
 
   const cityOwners = async () => {
-  return await contractRef.current.methods.getAllOwners().call();
-};
+    const allOwners = await contractRef.current.methods.getAllOwners().call();
+    return allOwners;
+  };
 
-  const produceSoldiers = async (landId) => {
+  const produceSoldiers = async landId => {
     if (!(await isTheBarrackBusy(landId))) {
-      const toastId = toast.loading("Askerler kışlaya alınıyor...");
+      const toastId = toast.loading('Askerler kışlaya alınıyor...');
       await contractRef.current.methods.produceSoldiers(landId).send({ from: account }, (err, res) => {
         toast.dismiss(toastId);
         if (err) {
-          console.log("An error occured!", err);
-          toast.error("Askerler kışlaya alınırken bir hata meydana geldi!");
+          toast.error('Askerler kışlaya alınırken bir hata meydana geldi!');
           return;
         }
-        
-        toast((t) => (
+
+        toast(t => (
           <span>
-           Askerler kışlaya başarıyla alındı. 5 dakikaya hazır olacaklar! TxId: <b className="text-break">{res}</b>
+            Askerler kışlaya başarıyla alındı. 5 dakikaya hazır olacaklar! TxId:
+            {' '}
+            <b className="text-break">{res}</b>
             <button type="button" className="btn btn-light float-right" onClick={() => toast.dismiss(t.id)}>
               Kapat
             </button>
           </span>
         ), {
           duration: 20000,
-          type: 'success'
+          type: 'success',
         });
       });
-    }
-    else{
-      toast.error('Barakalarda zaten askerler eğitiliyor!');
+    } else {
+      toast.error('Kışlada zaten askerler eğitiliyor!');
     }
   };
 
-  const getSoldierNumberByCityId = async (landId) => {
-    return await contractRef.current.methods.getSoldiersByCity(landId).call();
+  const isSoldiersClaimable = async landId => {
+    const isSoldierClaimable = await contractRef.current.methods.isSoldiersClaimable(landId).call();
+    return isSoldierClaimable;
   };
 
-  /******************************************** */
+  const claimSoldiers = async landId => {
+    if (!await isTheBarrackBusy(landId)) {
+      toast.warning('Kışlada eğitilecek asker yok!');
+      return;
+    }
+
+    if (await isSoldiersClaimable(landId)) {
+      const toastId = toast.loading('Askerler kışladan allınıyor...');
+      await contractRef.current.methods.claimSoldiers(landId).send({ from: account }, err => {
+        toast.dismiss(toastId);
+        if (err) {
+          toast.error('Kışla yolunda kaza meydana geldi!');
+          return;
+        }
+
+        toast(() => (
+          <span>
+            Askerleriniz savaş için hazır!
+          </span>
+        ), {
+          duration: 20000,
+          type: 'success',
+        });
+      });
+    } else {
+      toast.warning('Askerlerinizin eğitimi henüz bitmedi!');
+    }
+  };
+
+  const getSoldierNumberByCityId = async landId => {
+    const soldiers = await contractRef.current.methods.getSoldiersByCity(landId).call();
+    return soldiers;
+  };
+
+  /** ****************************************** */
 
   useEffect(() => {
     setIsMetaMaskInstalled(window.ethereum !== undefined);
@@ -107,13 +143,17 @@ function MetaMaskProvider({ children }) {
         connectMetaMask,
         account,
         chainId,
+        contractRef,
         battle,
         buyLand,
         produceSoldiers,
         isTheBarrackBusy,
         getSoldierNumberByCityId,
         cityOwners,
-      }}>
+        isSoldiersClaimable,
+        claimSoldiers,
+      }}
+    >
       {children}
     </MetaMaskContext.Provider>
   );

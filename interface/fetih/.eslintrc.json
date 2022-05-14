@@ -12,8 +12,7 @@
         "sourceType": "module"
     },
     "plugins": [
-        "react",
-        "only-warn"
+        "react"
     ],
     "rules": {
         "max-len": 0,
