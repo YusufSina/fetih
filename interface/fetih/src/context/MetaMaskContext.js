@@ -51,7 +51,27 @@ function MetaMaskProvider({ children }) {
 
   const produceSoldiers = async (landId) => {
     if (!(await isTheBarrackBusy(landId))) {
-      await contractRef.current.methods.produceSoldiers(landId).send({ from: account });
+      const toastId = toast.loading("Askerler kışlaya alınıyor...");
+      await contractRef.current.methods.produceSoldiers(landId).send({ from: account }, (err, res) => {
+        toast.dismiss(toastId);
+        if (err) {
+          console.log("An error occured!", err);
+          toast.error("Askerler kışlaya alınırken bir hata meydana geldi!");
+          return;
+        }
+        
+        toast((t) => (
+          <span>
+           Askerler kışlaya başarıyla alındı. 5 dakikaya hazır olacaklar! TxId: <b className="text-break">{res}</b>
+            <button type="button" className="btn btn-light float-right" onClick={() => toast.dismiss(t.id)}>
+              Kapat
+            </button>
+          </span>
+        ), {
+          duration: 20000,
+          type: 'success'
+        });
+      });
     }
     else{
       toast.error('Barakalarda zaten askerler eğitiliyor!');
