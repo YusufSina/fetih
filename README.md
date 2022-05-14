@@ -1,5 +1,7 @@
 # FETİH
 
+![Map Image](ss1.png)
+
 Fetih, blockchain tabanlı bir strateji oyunudur.
 
 UI tarafında React.js, backend tarafında C# Dotnet Core 3.1, akıllı sözleşmeler tarafında solidity teknolojilerini kullanacağız.
@@ -23,9 +25,13 @@ Bilgisayarınızda Node.js (v17.3.0) kurulu olması gerekmekte. Node.js kurulu i
 
 yapmanız ile kullanıcı arayüz uygulaması çalışacaktır.
 
+Test URL: 
+
 ### BACKEND
 
 Bilgisayarınızda dotnet SDK 3.1 kurulu olmalı. Visual Studio ile proje dizinini açıp direkt kestrel üzerinde çalıştırabilirsiniz.
+
+Test URL: https://fetih.somee.com/
 
 ### CONTRACTS
 
@@ -33,9 +39,6 @@ Akıllı sözleşmelere contracts klasörünün içerisinden erişebilirsiniz.
 
 Kontratlar Rinkeby Network üzerinde yayındadır. 
 
-Oracle Kontrat: https://rinkeby.etherscan.io/address/0xa82B968B338E8f7eEE1dCB289c8718244B72b412
+Oracle Client Kontrat: https://rinkeby.etherscan.io/address/0xa82B968B338E8f7eEE1dCB289c8718244B72b412
 
-Fetih Kontrat: https://rinkeby.etherscan.io/address/0xFcaDa45444d67c95Eb043a7DBac6d19795bB61d9
-
-İlerleyen saatlerde burayı detaylandıracağız...
-
+Fetih Kontrat: https://rinkeby.etherscan.io/address/0xcbf6D9cA657af62c8041b3b0eDef37c6cbfd2c1F#events
