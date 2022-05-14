@@ -2,12 +2,12 @@
 pragma solidity ^0.8.7;
 
 import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract FetihOracleClient is ChainlinkClient {
     using Chainlink for Chainlink.Request;
   
     string private API_URL;
-    bool public isSucceed;
 
     address private oracle;
     bytes32 private jobId;
@@ -15,14 +15,27 @@ contract FetihOracleClient is ChainlinkClient {
     address private linkToken;
 
     address owner;
+
+    struct RequestModel {
+        uint256 attackerId;
+        uint256 defenderId;
+    }
+
+    mapping(bytes32 => RequestModel) REQUEST_MODELS;
+    address FETIH;
+
+    event UpdateOwner(address oldOwner, address newOwner);
+    event UpdateApiUrl(string oldApiUrl, string newApiUrl);
+    event UpdateFetih(address oldFetih, address newFetih);
     
     /**
      * Network: Rinkeby
      * Oracle: 0x3A56aE4a2831C3d3514b5D7Af5578E45eBDb7a40 
      * Job ID: 99e99d6e82be464a9e4b6acc55bbcf14
      * Fee: 0.01 LINK
+     * Lives at 0x3b63a487B00Bed56a2B4D9c999735d38adC5Eabb on Rinkeby Network
      */
-    constructor(string memory _apiUrl) {
+    constructor(string memory _apiUrl, address _fetihAddr) {
         linkToken = 0x01BE23585060835E02B77ef475b0Cc51aA1e0709;
         setChainlinkToken(linkToken);
         oracle = 0x3A56aE4a2831C3d3514b5D7Af5578E45eBDb7a40;
@@ -31,19 +44,22 @@ contract FetihOracleClient is ChainlinkClient {
 
         owner = msg.sender;
         API_URL = _apiUrl;
+        FETIH = _fetihAddr;
     }
     
-    function requestVolumeData() public returns (bytes32 requestId) 
+    function requestData(uint256 attackerId, uint256 defenderId, uint256 attackerSoldiers, uint256 defenderSoldiers) public onlyFetih returns (bytes32 requestId) 
     {
         Chainlink.Request memory request = buildChainlinkRequest(jobId, address(this), this.fulfill.selector);
         
         // Set the URL to perform the GET request on
-        request.add("get", API_URL);
+        request.add("get", string(abi.encodePacked(API_URL, Strings.toString(attackerId), "/", Strings.toString(defenderId), "/", Strings.toString(attackerSoldiers), "/", Strings.toString(defenderSoldiers))));
         
         request.add("path", "isSucceed");
-                
+        requestId = sendChainlinkRequestTo(oracle, request, fee);
+
+        REQUEST_MODELS[requestId] = RequestModel(attackerId, defenderId);
         // Sends the request
-        return sendChainlinkRequestTo(oracle, request, fee);
+        return requestId;
     }
     
     /**
@@ -51,7 +67,9 @@ contract FetihOracleClient is ChainlinkClient {
      */ 
     function fulfill(bytes32 _requestId, bool _isSucceed) public recordChainlinkFulfillment(_requestId)
     {
-        isSucceed = _isSucceed;
+        RequestModel memory model = REQUEST_MODELS[_requestId];
+
+        IFetih(getFetih()).battleResult(model.attackerId, model.defenderId, _isSucceed);
     }
 
     function getOwner() public view returns(address) {
@@ -89,18 +107,35 @@ contract FetihOracleClient is ChainlinkClient {
         IERC20(linkToken).transfer(msg.sender, _amount);
     }
 
+    function getFetih() public view returns(address) {
+        return FETIH;
+    }
+
+    function changeFetih(address _newFetih) external onlyOwner {
+        emit UpdateFetih(getFetih(), _newFetih);
+
+        FETIH = _newFetih;
+    }
+
     modifier onlyOwner() {
         require(owner == msg.sender, "Not owner!");
         _;
     }
 
-    event UpdateOwner(address oldOwner, address newOwner);
-    event UpdateApiUrl(string oldApiUrl, string newApiUrl);
+    modifier onlyFetih() {
+        require(msg.sender == getFetih(), "You are not fetih contract!");
+
+        _;
+    }
 
     // function withdrawLink() external {} - Implement a withdraw function to avoid locking your LINK in the contract
 }
 
 interface IERC20 {
     function transfer(address to, uint256 amount) external returns (bool);
+}
+
+interface IFetih {
+    function battleResult(uint256 attackerTokenId, uint256 defenderTokenId, bool isSucceed) external;
 }
 
