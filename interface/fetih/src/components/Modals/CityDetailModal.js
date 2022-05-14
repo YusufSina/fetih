@@ -8,12 +8,47 @@ import { percent } from '../../helpers/Utilities';
 import { MetaMaskContext } from '../../context/MetaMaskContext';
 
 function CityDetailModal({ onHide, data }) {
-  const { isTheBarrackBusy, getSoldierNumberByCityId } = useContext(MetaMaskContext);
+  const { isTheBarrackBusy, getSoldierNumberByCityId, isSoldiersClaimable } = useContext(MetaMaskContext);
 
   const [attack, setAttack] = useState(0);
   const [defence, setDefence] = useState(0);
   const [isBarrackBusy, setIsBarrackBusy] = useState(false);
+  const [soldiersClaimable, setSoldiersClaimable] = useState(false);
   const [soldierNumber, setSoldierNumber] = useState(0);
+
+  const renderBarrackState = () => {
+    if (soldiersClaimable) {
+      return (
+        <>
+          <Badge pill bg="success">
+            Askerler Toplanabilir
+          </Badge>
+          <br />
+          <span>Kışla sorumlusu elinden gelenin en iyisini yaptı!</span>
+        </>
+      );
+    }
+    if (isBarrackBusy) {
+      return (
+        <>
+          <Badge pill bg="info">
+            Eğitim Devam Ediyor
+          </Badge>
+          <br />
+          <span>Kışla sorumlusu eğitilecek askerleri olduğu için çok mutlu!!</span>
+        </>
+      );
+    }
+    return (
+      <>
+        <Badge pill bg="warning">
+          Kışla Boş
+        </Badge>
+        <br />
+        <span>Kışla sorumlusu son zamanlarda öğrencilerinin az olmasından yakınıyor!</span>
+      </>
+    );
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -21,11 +56,12 @@ function CityDetailModal({ onHide, data }) {
       setIsBarrackBusy(barrackState);
       const soldierNumberState = await getSoldierNumberByCityId(data.id);
       setSoldierNumber(soldierNumberState);
+      const soldierClaimable = await isSoldiersClaimable(data.id);
+      setSoldiersClaimable(soldierClaimable);
     }
     fetchData();
     setAttack(data.attributes.find(f => f.trait_type === 'attack_power').value);
     setDefence(data.attributes.find(f => f.trait_type === 'defence_power').value);
-
   }, [data]);
 
   return (
@@ -44,7 +80,13 @@ function CityDetailModal({ onHide, data }) {
         <Card>
           <Card.Img variant="top" src={data.image} />
           <Card.Body>
-            <Card.Title as="h3">{data.name} #{data.id} </Card.Title>
+            <Card.Title as="h3">
+              {data.name}
+              {' '}
+              #
+              {data.id}
+              {' '}
+            </Card.Title>
             <Card.Text>
               {data.description}
             </Card.Text>
@@ -73,27 +115,7 @@ function CityDetailModal({ onHide, data }) {
               <div className="col-md-6">
                 <Card.Title as="h6">Kışla Durumu</Card.Title>
                 <Card.Text>
-                  {
-                    isBarrackBusy ?
-                      (
-                        <>
-                          <Badge pill bg="success">
-                            Eğitim Devam Ediyor
-                          </Badge>
-                          <br/>
-                          <span>Kışla sorumlusu eğitilecek askerleri olduğu için çok mutlu!!</span>
-                        </>
-                      ) :
-                      (
-                        <>
-                          <Badge pill bg="warning">
-                            Kışla Boş
-                          </Badge>
-                          <br/>
-                          <span>Kışla sorumlusu son zamanlarda öğrencilerinin az olmasından yakınıyor!</span>
-                        </>
-                      )
-                  }
+                  {renderBarrackState()}
                 </Card.Text>
               </div>
               <div className="col-md-6">

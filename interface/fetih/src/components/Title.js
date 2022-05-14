@@ -1,14 +1,39 @@
-import React, { useContext, useState } from "react";
-import { Button, Badge } from "react-bootstrap";
-import Modal from "react-bootstrap/Modal";
-import { MetaMaskContext } from "../context/MetaMaskContext";
-import { shortenAccountAddress } from "../helpers/Utilities";
+import React, { useContext, useState } from 'react';
+import { Button, Badge } from 'react-bootstrap';
+import Modal from 'react-bootstrap/Modal';
+import { MetaMaskContext } from '../context/MetaMaskContext';
+import { shortenAccountAddress } from '../helpers/Utilities';
 
 function Title() {
-  const { connectMetaMask, account, isMetaMaskInstalled } =
-    useContext(MetaMaskContext);
+  const { connectMetaMask, account, isMetaMaskInstalled } = useContext(MetaMaskContext);
   const [walletModal, setWalletModal] = useState(false);
   const handleClose = () => setWalletModal(false);
+
+  const renderConnectButton = () => {
+    if (isMetaMaskInstalled) {
+      if (account === '') {
+        return (
+          <b>Metamaskı bağlayın!</b>
+        );
+      }
+      return (
+        <Badge pill bg="dark">
+          {shortenAccountAddress(account)}
+        </Badge>
+      );
+    }
+    return (
+      <a
+        target="_blank"
+        href="https://metamask.io/"
+        rel="noopener noreferrer"
+        color="#E8831D"
+        className="float-start"
+      >
+        <b>Metamaskı yükleyiniz!</b>
+      </a>
+    );
+  };
 
   return (
     <div className="jumbotron px-3 title-fetih">
@@ -17,12 +42,12 @@ function Title() {
           <img
             src="/assets/img/Logo.png"
             className="img-fluid"
-            style={{ width: "270px", height: "auto" }}
+            style={{ width: '270px', height: 'auto' }}
             alt="logo"
           />
         </div>
         <div className="d-flex flex-column justify-content-end align-items-center">
-          {account === "" ? (
+          {account === '' ? (
             <Button
               variant="outline-light"
               onClick={() => setWalletModal(true)}
@@ -59,25 +84,7 @@ function Title() {
               <div className="row">
                 <div className="col-md-6">
                   <div color="#E8831D" className="mt-3 float-start">
-                    {isMetaMaskInstalled ? (
-                      account === "" ? (
-                        <b>Metamaskı bağlayın!</b>
-                      ) : (
-                        <Badge pill bg="dark">
-                          {shortenAccountAddress(account)}
-                        </Badge>
-                      )
-                    ) : (
-                      <a
-                        target="_blank"
-                        href="https://metamask.io/"
-                        rel="noopener noreferrer"
-                        color="#E8831D"
-                        className="float-start"
-                      >
-                        <b>Metamaskı yükleyiniz!</b>
-                      </a>
-                    )}
+                    {renderConnectButton()}
                   </div>
                 </div>
                 <div className="col-md-6">
