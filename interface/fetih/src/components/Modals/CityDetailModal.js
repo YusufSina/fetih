@@ -1,31 +1,66 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
+import Card from 'react-bootstrap/Card';
+import ProgressBar from 'react-bootstrap/ProgressBar';
 import PropTypes from 'prop-types';
+import { percent } from '../../helpers/Utilities';
 
 function CityDetailModal({ onHide, data }) {
+  const [attack, setAttack] = useState(0);
+  const [defence, setDefence] = useState(0);
+
+  useEffect(() => {
+    setAttack(data.attributes.find(f => f.trait_type === 'attack_power').value);
+    setDefence(data.attributes.find(f => f.trait_type === 'defence_power').value);
+  }, [data]);
+
   return (
     <Modal
       show
       onHide={() => onHide()}
-      dialogClassName="modal-90w"
+      centered
+      size="lg"
     >
       <Modal.Header closeButton>
         <Modal.Title>
-          {data.name}
-          {' '}
-          Detay
+          Şehir Detayı
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>
-          Ipsum molestiae natus adipisci modi eligendi? Debitis amet quae unde
-          commodi aspernatur enim, consectetur. Cumque deleniti temporibus
-          ipsam atque a dolores quisquam quisquam adipisci possimus
-          laboriosam. Quibusdam facilis doloribus debitis! Sit quasi quod
-          accusamus eos quod. Ab quos consequuntur eaque quo rem! Mollitia
-          reiciendis porro quo magni incidunt dolore amet atque facilis ipsum
-          deleniti rem!
-        </p>
+        <Card>
+          <Card.Img variant="top" src={data.image} />
+          <Card.Body>
+            <Card.Title as="h3">{data.name}</Card.Title>
+            <Card.Text>
+              {data.description}
+            </Card.Text>
+            <Card.Title as="h4">Özellikler</Card.Title>
+            <div className="row">
+              <div className="col-md-6">
+                <Card.Title as="h6">Saldırı Gücü</Card.Title>
+                <Card.Text>
+                  <ProgressBar
+                    className="progress-transition"
+                    variant="danger"
+                    now={percent(attack, 10)}
+                    label={attack}
+                  />
+                </Card.Text>
+              </div>
+              <div className="col-md-6">
+                <Card.Title as="h6">Savunma Gücü</Card.Title>
+                <Card.Text>
+                  <ProgressBar
+                    className="progress-transition"
+                    variant="info"
+                    now={percent(defence, 10)}
+                    label={defence}
+                  />
+                </Card.Text>
+              </div>
+            </div>
+          </Card.Body>
+        </Card>
       </Modal.Body>
     </Modal>
   );
