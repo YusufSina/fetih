@@ -33,12 +33,9 @@ function Game() {
     });
 
     const web3 = new Web3(window.ethereum);
-    console.log(web3);
-    // if (web3) {
-    //   const contract = new web3.eth.Contract(FetihContract.ABI, FetihContract.ADDRESS);
-    //   console.log(contract);
-    //   console.log(web3);
-    // }
+
+    const contract = new web3.eth.Contract(FetihContract.ABI, FetihContract.ADDRESS);
+    contract.methods.getAllOwners().call().then(result => console.log(result));
   }, []);
 
   return (

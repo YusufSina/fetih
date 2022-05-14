@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Button from 'react-bootstrap/Button';
 import PropTypes from 'prop-types';
-import { NeighboringProvinces } from '../helpers/Consts';
+import { FetihContract, NeighboringProvinces } from '../helpers/Consts';
 import CityDetailModal from './Modals/CityDetailModal';
 import { LoadingHelper } from '../helpers/Utilities';
 import { Fetch } from './Fetch';
+import { MetaMaskContext } from '../context/MetaMaskContext';
+import Web3 from 'web3';
 
 function RightClickMenu({ id, top, left, show }) {
+  const { account } = useContext(MetaMaskContext);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [cityDetail, setCityDetail] = useState({});
 
@@ -22,13 +25,21 @@ function RightClickMenu({ id, top, left, show }) {
       });
   };
 
+  const battle = async (attackerId, defenderId) => {
+    const web3 = new Web3(window.ethereum);
+
+    const contract = new web3.eth.Contract(FetihContract.ABI, FetihContract.ADDRESS);
+    await contract.methods.battle(attackerId, defenderId).send({ from: account });
+
+  }
+
   const renderAttackButton = () => {
-    const neighborCityNames = NeighboringProvinces[id].map(_id => document.getElementById(_id).getAttribute('name'));
+    const neighborCityNames = NeighboringProvinces[id].map(_id => ({ name: document.getElementById(_id).getAttribute('name'), id: _id}));
     return (
       <Dropdown as={ButtonGroup}>
         <Dropdown.Toggle id="attack-btn-drp" className='rightClickContext-btn'>Saldır</Dropdown.Toggle>
         <Dropdown.Menu >
-          {neighborCityNames.map((name, index) => (<Dropdown.Item key={index} eventKey={index}>{name}</Dropdown.Item>))}
+          {neighborCityNames.map((city, index) => (<Dropdown.Item key={index} eventKey={index} onClick={async () => await battle(id, city.id)}>{city.name}</Dropdown.Item>))}
         </Dropdown.Menu>
       </Dropdown>
     );
