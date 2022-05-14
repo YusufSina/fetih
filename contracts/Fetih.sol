@@ -11,26 +11,32 @@ interface IFetihOracleClient {
 
 contract Fetih is ERC721, ERC721Enumerable, Ownable {
     string BASE_URI;
-    uint256 MAX_SUPPLY;
-    uint256 BUY_PRICE = 0.1 * (10 ** 18);
+    uint256 constant MAX_SUPPLY = 81;
+    uint256 constant CITY_PRICE = 0.1 * (10 ** 18);
     bool IS_WAR_ENDED;
     address ORACLE_CLIENT;
-    uint256 MINIMUM_DEFENDER_SOLDIER = 1;
-    uint256 MINIMUM_ATTACKER_SOLDIER = 3;
+    uint256 constant MINIMUM_DEFENDER_SOLDIER = 1;
+    uint256 constant MINIMUM_ATTACKER_SOLDIER = 3;
+    uint256 constant PROD_SOLDIER_COST = CITY_PRICE / 10;
 
     mapping(uint256 => uint256) _soldiers;
     mapping(uint256 => mapping(uint256 => bool)) _invadableCities;
+    mapping(address => mapping(uint256 => uint256)) _barrack;
 
     event UpdateBaseURI(string oldBaseURI, string newBaseURI);
     event BoughtCity(address sender, uint256 tokenId, uint256 amount);
     event UpdateOracleClient(address oldClient, address newClient);
+    event StartedBattle(address emperor, uint256 attackerTokenId, uint256 defenderTokenId);
+    event WonBattle(address emperor, uint256 conqueredTokenId);
+    event LostBattle(address emperor, uint256 attackerTokenId, uint256 defenderTokenId);
+    event PushSoldier(address emperor, uint256 tokenId);
+    event ClaimSoldier(address emperor, uint256 tokenId);
     
     constructor(string memory _baseUri) ERC721("Fetih", "FTH") {
         BASE_URI = _baseUri;
-        MAX_SUPPLY = 81;
 
         uint256 iterator = 1;
-        for(;iterator <= MAX_SUPPLY;) {
+        for(;iterator <= maxSupply();) {
             _safeMint(address(this), iterator);
             _soldiers[iterator] = 10;
             
@@ -42,15 +48,15 @@ contract Fetih is ERC721, ERC721Enumerable, Ownable {
         initInvadableCities();
     }
 
-    function getMinimumDefenderSoldier() internal view returns(uint256) {
+    function getMinimumDefenderSoldier() internal pure returns(uint256) {
         return MINIMUM_DEFENDER_SOLDIER;
     }
 
-    function getMinimumAttackerSoldier() internal view returns(uint256) {
+    function getMinimumAttackerSoldier() internal pure returns(uint256) {
         return MINIMUM_ATTACKER_SOLDIER;
     }
 
-    function maxSupply() public view returns (uint256) {
+    function maxSupply() public pure returns (uint256) {
         return MAX_SUPPLY;
     }
 
@@ -75,7 +81,7 @@ contract Fetih is ERC721, ERC721Enumerable, Ownable {
     function buyCity(uint256 tokenId) external payable {
         require(tokenId > 0 && tokenId <= maxSupply(), "There is no city with given tokenId!");
         require(balanceOf(msg.sender) == 0, "Can't buy when you have one!");
-        require(msg.value >= BUY_PRICE, "Amount is not enough!");
+        require(msg.value >= CITY_PRICE, "Amount is not enough!");
 
         emit BoughtCity(msg.sender, tokenId, msg.value);
 
@@ -88,30 +94,58 @@ contract Fetih is ERC721, ERC721Enumerable, Ownable {
         require(_soldiers[attackerTokenId] >= getMinimumAttackerSoldier(), "City has more than 2 soldiers to attack!");
         require(isInvadableCity(attackerTokenId, defenderTokenId), "You should attack to city that has shared borders with attacking city!");
 
+        emit StartedBattle(msg.sender, attackerTokenId, defenderTokenId);
+
         IFetihOracleClient(getOracleClient()).requestData(attackerTokenId, defenderTokenId, _soldiers[attackerTokenId], _soldiers[defenderTokenId]);
     }
 
-    function battleResult(uint256 attackerTokenId, uint256 defenderTokenId, bool isSucceed) public onlyOracleClient {
+    function battleResult(uint256 attackerTokenId, uint256 defenderTokenId, bool isSucceed) public onlyOracleClient whenWarContinues {
         uint256 attackerSoldiers = _soldiers[attackerTokenId];
         uint256 defenderSoldiers = _soldiers[defenderTokenId];
         address attackingEmperor = ownerOf(attackerTokenId);
         address defendingEmperor = ownerOf(defenderTokenId);
 
         if (isSucceed || defenderSoldiers == getMinimumDefenderSoldier()) {
-            attackerSoldiers -= 1;
+            //if wins
+            emit WonBattle(msg.sender, defenderTokenId);
+            if (attackerSoldiers > 1) {
+                attackerSoldiers -= 1; 
+            }
+
             defenderSoldiers = 1;
+
+            _soldiers[attackerTokenId] = attackerSoldiers;
+            _soldiers[defenderTokenId] = defenderSoldiers;
 
             _transfer(defendingEmperor, attackingEmperor, defenderTokenId);
 
             // if all cities conquered
             uint256 amount = balanceOf(attackingEmperor);
             if (amount == maxSupply()) {
-                sendViaCall(payable(attackingEmperor), address(this).balance);
+                uint256 totalPrice = address(this).balance * 9 / 10;
+                uint256 comission = address(this).balance / 10;
+
+                sendViaCall(payable(attackingEmperor), totalPrice);
+                sendViaCall(payable(owner()), comission);
             }
         }
         else {
-            attackerSoldiers -= 3;
-            defenderSoldiers -= 1;
+            //if loses
+            emit LostBattle(msg.sender, attackerTokenId, defenderTokenId);
+
+            if (attackerSoldiers <= 3) {
+                attackerSoldiers = 1;
+            } else {
+                attackerSoldiers -= 3;
+            }
+
+            if (defenderSoldiers > 1) {
+                defenderSoldiers -= 1;
+            }
+
+            _soldiers[attackerTokenId] = attackerSoldiers;
+            _soldiers[defenderTokenId] = defenderSoldiers;
+
         }
     }
 
@@ -130,6 +164,63 @@ contract Fetih is ERC721, ERC721Enumerable, Ownable {
         // This is the current recommended method to use.
         (bool sent,) = _to.call{value: amount}("");
         require(sent, "Failed to send Ether");
+    }
+
+    function produceSoldiers(uint256 tokenId) external whenWarContinues {
+        require(ownerOf(tokenId) == msg.sender, "You should be emperor of the city!");
+        require(!isTheBarrackBusy(tokenId), "Barrack is busy, claim your soldiers first!");
+        
+        emit PushSoldier(msg.sender, tokenId);
+
+        _barrack[msg.sender][tokenId] = block.timestamp + 3600;
+    }
+
+    function isTheBarrackBusy(uint256 tokenId) public view returns (bool) {
+        if (_barrack[msg.sender][tokenId] == 0) return false;
+
+        return true;
+    }
+
+    function claimSoldiers(uint256 tokenId) external whenWarContinues {
+        require(ownerOf(tokenId) == msg.sender, "You should be emperor of the city!");
+        require(isTheBarrackBusy(tokenId), "You should start producing soldier first!");
+        require(block.timestamp >= _barrack[msg.sender][tokenId], "Soldiers are not ready!");
+
+        emit ClaimSoldier(msg.sender, tokenId);
+
+        _barrack[msg.sender][tokenId] = 0;
+        _soldiers[tokenId] += 5;
+    }
+
+    function getAllSoldiers() external view returns(uint256[] memory) {
+        uint256[] memory soldiers = new uint256[](maxSupply());
+        uint256 iterator = 0;
+        for(;iterator > maxSupply();) {
+            soldiers[iterator] = _soldiers[iterator + 1];
+
+            unchecked {
+                iterator++;
+            }
+        }
+
+        return soldiers;
+    }
+
+    function getSoldiersByCity(uint256 tokenId) external view returns(uint256) {
+        return _soldiers[tokenId];
+    }
+
+    function getAllOwners() external view returns(address[] memory) {
+        address[] memory owners = new address[](maxSupply());
+        uint256 iterator = 0;
+        for(;iterator > maxSupply();) {
+            owners[iterator] = ownerOf(iterator + 1);
+            unchecked {
+                iterator++;
+            }
+        }
+
+        return owners;
     }
 
     modifier whenWarEnded(address from) {
