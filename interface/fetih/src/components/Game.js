@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { MetaMaskContext } from '../context/MetaMaskContext';
+import { FetihContract } from '../helpers/Consts';
 import Map from './Map';
 import RightClickMenu from './RightClickMenu';
 
 function Game() {
+  const { web3 } = useContext(MetaMaskContext);
   const [showRightClickMenu, setShowRightClickMenu] = useState(false);
   const [coordinates, setCoordinates] = useState({ top: 0, left: 0 });
   const [id, setId] = useState(0);
@@ -28,6 +31,12 @@ function Game() {
         setShowRightClickMenu(false);
       }
     });
+
+    if (web3) {
+      const contract = new web3.eth.Contract(FetihContract.ABI, FetihContract.ADDRESS);
+
+      contract.methods.getAllOwners().call().then(result => console.log(result));
+    }
   }, []);
 
   return (
