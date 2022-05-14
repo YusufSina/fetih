@@ -6,19 +6,20 @@ import PropTypes from 'prop-types';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import { NeighboringProvinces } from '../helpers/Consts';
 import CityDetailModal from './Modals/CityDetailModal';
+import { LoadingHelper } from '../helpers/Utilities';
+import { Fetch } from './Fetch';
 
-function RightClickMenu({ id, top, left }) {
+function RightClickMenu({ id, top, left, show }) {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [cityDetail, setCityDetail] = useState({});
 
   const onDetailClick = () => {
-    fetch(`https://fetih.somee.com/city/cityDetail/${id}`)
-      .then(response => {
-        if (response.ok) {
-          response.json().then(value => setCityDetail({ ...value }));
-          setShowDetailModal(true);
-        }
-        return false;
+    LoadingHelper.ShowLoading();
+    Fetch(`https://fetih.somee.com/city/cityDetail/${id}`)
+      .then(data => {
+        setCityDetail({ ...data });
+        setShowDetailModal(true);
+        LoadingHelper.HideLoading();
       });
   };
 
@@ -31,11 +32,15 @@ function RightClickMenu({ id, top, left }) {
     );
   };
 
+  if (id === 0) {
+    return null;
+  }
+
   return (
     <>
       <ButtonGroup
         vertical
-        style={{ top, left, position: 'absolute' }}
+        style={{ top, left, position: 'absolute', display: show ? 'block' : 'none' }}
       >
         <Button onClick={() => onDetailClick()}>Detay</Button>
         {renderAttackButton()}
@@ -56,6 +61,7 @@ RightClickMenu.propTypes = {
   id: PropTypes.number.isRequired,
   top: PropTypes.number.isRequired,
   left: PropTypes.number.isRequired,
+  show: PropTypes.bool.isRequired,
 };
 
 export default RightClickMenu;

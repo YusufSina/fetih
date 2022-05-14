@@ -13,3 +13,10 @@ path {
  .rightClickContext{
    position: absolute;
  }
+
+ .progress-transition {
+  transition-delay: 10s;
+  transition-duration: 2s;
+  transition-timing-function: cubic-bezier(0.45, 0.49, 1, 0.08);
+  transition-property: all;
+}

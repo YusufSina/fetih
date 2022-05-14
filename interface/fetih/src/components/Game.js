@@ -33,7 +33,7 @@ function Game() {
   return (
     <>
       <Map />
-      {showRightClickMenu && <RightClickMenu id={id} top={coordinates.top} left={coordinates.left} />}
+      <RightClickMenu id={id} top={coordinates.top} left={coordinates.left} show={showRightClickMenu} />
     </>
 
   );
