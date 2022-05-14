@@ -68,7 +68,7 @@ contract Fetih is ERC721, ERC721Enumerable, Ownable {
         BASE_URI = _baseUri;
     }
 
-    function isInvadableCity(uint256 attackerTokenId, uint256 defenderTokenId) internal returns(bool) {
+    function isInvadableCity(uint256 attackerTokenId, uint256 defenderTokenId) internal view returns(bool) {
         return _invadableCities[attackerTokenId][defenderTokenId];
     }
 
