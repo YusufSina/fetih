@@ -30,7 +30,7 @@ function CityDetailModal({ onHide, data }) {
         <Card>
           <Card.Img variant="top" src={data.image} />
           <Card.Body>
-            <Card.Title as="h3">{data.name}</Card.Title>
+            <Card.Title as="h3">{data.name} #{data.id} </Card.Title>
             <Card.Text>
               {data.description}
             </Card.Text>
