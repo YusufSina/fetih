@@ -57,7 +57,7 @@ namespace fetih_service
 
             app.UseHttpsRedirection();
 
-            app.UseCors();
+            app.UseCors("CorsPolicy");
 
             app.UseRouting();
 

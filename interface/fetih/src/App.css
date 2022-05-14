@@ -1,0 +1,22 @@
+path {
+    transition: all .2s ease-in-out; 
+    transform-origin: center;
+   z-index: -100;
+ }
+ 
+ path:hover {
+   transform: scale(1.01);
+   z-index: 100;
+   fill: black;
+ }
+ 
+ .rightClickContext{
+   position: absolute;
+ }
+
+ .progress-transition {
+  transition-delay: 10s;
+  transition-duration: 2s;
+  transition-timing-function: cubic-bezier(0.45, 0.49, 1, 0.08);
+  transition-property: all;
+}
