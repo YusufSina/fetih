@@ -3,7 +3,6 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Button from 'react-bootstrap/Button';
 import PropTypes from 'prop-types';
-import DropdownButton from 'react-bootstrap/DropdownButton';
 import { NeighboringProvinces } from '../helpers/Consts';
 import CityDetailModal from './Modals/CityDetailModal';
 import { LoadingHelper } from '../helpers/Utilities';
@@ -26,9 +25,12 @@ function RightClickMenu({ id, top, left, show }) {
   const renderAttackButton = () => {
     const neighborCityNames = NeighboringProvinces[id].map(_id => document.getElementById(_id).getAttribute('name'));
     return (
-      <DropdownButton as={ButtonGroup} title="Saldır" id="attack-btn-drp">
-        {neighborCityNames.map((name, index) => (<Dropdown.Item key={index} eventKey={index}>{name}</Dropdown.Item>))}
-      </DropdownButton>
+      <Dropdown as={ButtonGroup}>
+        <Dropdown.Toggle id="attack-btn-drp" className='rightClickContext-btn'>Saldır</Dropdown.Toggle>
+        <Dropdown.Menu >
+          {neighborCityNames.map((name, index) => (<Dropdown.Item key={index} eventKey={index}>{name}</Dropdown.Item>))}
+        </Dropdown.Menu>
+      </Dropdown>
     );
   };
 
@@ -42,7 +44,7 @@ function RightClickMenu({ id, top, left, show }) {
         vertical
         style={{ top, left, position: 'absolute', display: show ? 'block' : 'none' }}
       >
-        <Button onClick={() => onDetailClick()}>Detay</Button>
+        <Button className='rightClickContext-btn' onClick={() => onDetailClick()}>Detay</Button>
         {renderAttackButton()}
       </ButtonGroup>
       {

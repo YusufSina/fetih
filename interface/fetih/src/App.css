@@ -1,22 +1,38 @@
 path {
     transition: all .2s ease-in-out; 
     transform-origin: center;
-   z-index: -100;
+    z-index: -100;
  }
  
  path:hover {
    transform: scale(1.01);
    z-index: 100;
-   fill: black;
+   fill: #9C182F;
  }
  
  .rightClickContext{
    position: absolute;
  }
 
+ .rightClickContext-btn{
+  color: #fff !important;
+  background-color: #9C182F !important;
+  border-color: #9C182F !important;
+}
+
+.rightClickContext-btn:hover{
+  color: #fff !important;
+  background-color: #b61d36 !important;
+  border-color: #b61d36 !important;
+}
+
  .progress-transition {
   transition-delay: 10s;
   transition-duration: 2s;
   transition-timing-function: cubic-bezier(0.45, 0.49, 1, 0.08);
   transition-property: all;
+}
+
+.title-fetih{
+  background: linear-gradient(180deg, #9C182F 0%, #791829 100%);
 }

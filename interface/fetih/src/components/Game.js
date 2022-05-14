@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { MetaMaskContext } from '../context/MetaMaskContext';
 import { FetihContract } from '../helpers/Consts';
+import GameFooter from './GameFooter';
 import Map from './Map';
 import RightClickMenu from './RightClickMenu';
 
@@ -15,7 +16,7 @@ function Game() {
       if (e.target.tagName === 'path') {
         e.preventDefault();
         setShowRightClickMenu(true);
-        setCoordinates({ top: e.clientY, left: e.clientX });
+        setCoordinates({ top: e.clientY + window.scrollY, left: e.clientX });
         setId(parseInt(e.target.id, 10));
       }
     };
@@ -43,6 +44,7 @@ function Game() {
     <>
       <Map />
       <RightClickMenu id={id} top={coordinates.top} left={coordinates.left} show={showRightClickMenu} />
+      <GameFooter/>
     </>
 
   );

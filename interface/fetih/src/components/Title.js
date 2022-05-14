@@ -11,19 +11,15 @@ function Title() {
   const handleClose = () => setWalletModal(false);
 
   return (
-    <div
-      className="jumbotron pt-4 pb-3 px-3"
-      style={{ backgroundColor: "#878787" }}
-    >
+    <div className="jumbotron px-3 title-fetih">
       <div className="d-flex flex-row justify-content-between align-items-center">
         <div className="d-flex flex-row justify-content-around align-items-end">
           <img
-            src="https://picsum.photos/50"
-            className="img-thumbnail px-2 mb-0"
+            src="/assets/img/Logo.png"
+            className="img-fluid"
+            style={{ width: "270px", height: "auto" }}
             alt="logo"
           />
-          <h1 className="px-2 mb-0">FETİH</h1>
-          <p className="px-2 mb-0">Ele geçir ve kazan!</p>
         </div>
         <div className="d-flex flex-column justify-content-end align-items-center">
           {account === "" ? (

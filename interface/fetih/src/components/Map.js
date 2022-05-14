@@ -4,7 +4,7 @@ function Map() {
   return (
     <svg
       className="w-100 h-100 p-5 "
-      fill="#4fabe7"
+      fill="#60812F"
       stroke="#ffffff"
       strokeWidth="1"
       version="1.2"
@@ -12,7 +12,6 @@ function Map() {
       width="1000"
       height="500"
       xmlns="http://www.w3.org/2000/svg"
-      onClick={e => console.log('clicked: ', e.target.id)}
       id="game-map"
     >
       <g />
