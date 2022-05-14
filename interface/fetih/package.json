@@ -13,15 +13,16 @@
     "react-dom": "^18.1.0",
     "react-loading-ui": "^1.2.3",
     "react-scripts": "5.0.1",
+    "react-toastify": "^9.0.1",
     "web-vitals": "^2.1.4",
     "web3": "^1.7.3"
   },
-  "scripts": { 
-    "start": "react-app-rewired start", 
-    "build": "react-app-rewired build", 
-    "test": "react-app-rewired test", 
-    "eject": "react-scripts eject" 
-   },
+  "scripts": {
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-scripts eject"
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
