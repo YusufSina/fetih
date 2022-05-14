@@ -22,10 +22,6 @@ function Game() {
     const mappedOwnerList = _ownerList.map((_account, index) => ({ account: _account, landId: index + 1 })).filter(f => !areAccountsEqual(f.account, account));
     const neighboringProvinces = NeighboringProvinces[id];
     const result = neighboringProvinces.filter(f => mappedOwnerList.some(some => some.landId === f));
-    console.log({ account });
-    console.log({ mappedOwnerList });
-    console.log({ neighboringProvinces });
-    console.log({ result });
     return result;
   };
 
