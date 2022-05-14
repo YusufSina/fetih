@@ -49,6 +49,10 @@ function MetaMaskProvider({ children }) {
     return await contractRef.current.methods.isTheBarrackBusy(landId).call({ from: account });
   };
 
+  const cityOwners = async () => {
+  return await contractRef.current.methods.getAllOwners().call();
+};
+
   const produceSoldiers = async (landId) => {
     if (!(await isTheBarrackBusy(landId))) {
       const toastId = toast.loading("Askerler kışlaya alınıyor...");
@@ -107,7 +111,8 @@ function MetaMaskProvider({ children }) {
         buyLand,
         produceSoldiers,
         isTheBarrackBusy,
-        getSoldierNumberByCityId
+        getSoldierNumberByCityId,
+        cityOwners,
       }}>
       {children}
     </MetaMaskContext.Provider>
