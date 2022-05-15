@@ -93,7 +93,9 @@ function Game() {
             newValue[conqueredTokenId] = emperor;
             return [...newValue];
           });
-          toast.success('Son Yaptığınız Savaşı Kazandınız!');
+          if (emperor.toLowerCase() === account.toLowerCase()) {
+            toast.success('Son Yaptığınız Savaşı Kazandınız!');
+          }
         }
       },
     ).on('error', error => {
@@ -101,9 +103,11 @@ function Game() {
     });
 
     contractRef.current.events.LostBattle(
-      error => {
+      (error, event) => {
         if (!error) {
-          toast.success('Son Yaptığınız Savaşı Kaybettiniz!');
+          if (event.returnValues[0].toLowerCase() === account.toLowerCase()) {
+            toast.success('Son Yaptığınız Savaşı Kaybettiniz!');
+          }
         }
       },
     ).on('error', error => {
@@ -111,9 +115,11 @@ function Game() {
     });
 
     contractRef.current.events.ClaimSoldier(
-      error => {
+      (error, event) => {
         if (!error) {
-          toast.warning('Askerleriniz Hazır!');
+          if (event.returnValues[0].toLowerCase() === account.toLowerCase()) {
+            toast.warning('Askerleriniz Hazır!');
+          }
         }
       },
     ).on('error', error => {
