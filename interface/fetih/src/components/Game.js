@@ -27,7 +27,6 @@ function Game() {
   useEffect(() => {
     if (!initFlag) {
       setInıtFlag(true);
-      console.log('--init Game useEffect--');
       document.oncontextmenu = e => {
         if (e.target.tagName === 'path') {
           e.preventDefault();
@@ -52,15 +51,12 @@ function Game() {
   }, [initFlag]);
 
   useEffect(() => {
-    console.log('useEffect');
-    console.log({ cityOwnerList });
-    console.log({ ownerColors });
     if (typeof cityOwnerList === 'object' && Object.keys(cityOwnerList).length > 0 && typeof ownerColors === 'object' && Object.keys(ownerColors).length > 0) {
       cityOwnerList.forEach((f, index) => {
         if (!areAccountsEqual(f, FetihContract.ADDRESS)) {
           document
             .getElementById(index + 1)
-            .setAttribute('fill', ownerColors[f]);
+            .setAttribute('fill', ownerColors[f.toLowerCase()]);
         }
       });
     }
