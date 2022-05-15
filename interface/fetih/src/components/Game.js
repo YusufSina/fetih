@@ -74,7 +74,7 @@ function Game() {
         top={coordinates.top}
         left={coordinates.left}
         show={showRightClickMenu}
-        isCityEmpty={cityOwnerList[id - 1] === FetihContract.ADDRESS}
+        isCityEmpty={areAccountsEqual(cityOwnerList[id - 1], FetihContract.ADDRESS)}
         attackAbleCities={getAttackableCities(cityOwnerList)}
         isCityMine={areAccountsEqual(cityOwnerList[id - 1], account)}
       />
