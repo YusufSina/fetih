@@ -25,7 +25,7 @@ Bilgisayarınızda Node.js (v17.3.0) kurulu olması gerekmekte. Node.js kurulu i
 
 yapmanız ile kullanıcı arayüz uygulaması çalışacaktır.
 
-Test URL: 
+Test URL: https://fetih-yusufsina.vercel.app/
 
 ### BACKEND
 
