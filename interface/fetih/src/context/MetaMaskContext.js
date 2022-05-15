@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 /* eslint-disable no-prototype-builtins */
 /* eslint-disable react/jsx-no-constructed-context-values */
 import React, { useEffect, useRef, useState } from 'react';
@@ -36,8 +37,10 @@ function MetaMaskProvider({ children }) {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     if (accounts.length > 0) {
       setAccount(accounts[0]);
+      window.meta_mask.account = accounts[0];
     } else {
       setAccount('');
+      window.meta_mask.account = '';
     }
   };
   /** ***************************************** */
@@ -135,26 +138,21 @@ function MetaMaskProvider({ children }) {
   const initEvents = () => {
     contractRef.current.events.BoughtCity(
       (error, event) => {
-        console.log('BoughtCity');
         if (!error) {
           const { sender, tokenId } = event.returnValues;
           const cityName = document.getElementById(tokenId).getAttribute('name');
-          if (areAccountsEqual(account, sender)) {
+          if (areAccountsEqual(window.meta_mask.account, sender)) {
             toast.success(`${cityName} şehrini satın aldınız!`, { toastId: 'boughtcity_success' });
           } else {
             toast.info(`${cityName} şehri satın alındı!`, { toastId: 'boughtcity_info' });
           }
-          const newData = [...cityOwnerList];
-          console.log({ cityOwnerList });
+          const newData = [...window.cityOwnerList];
           newData[tokenId - 1] = sender.toLowerCase();
-          console.log({ newData });
           setCityOwnerList([...newData]);
 
-          const newOwnerColors = { ...ownerColors };
-          console.log({ ownerColors });
+          const newOwnerColors = { ...window.ownerColors };
           if (!newOwnerColors.hasOwnProperty(sender.toLowerCase())) {
             newOwnerColors[sender.toLowerCase()] = RandomColor();
-            console.log({ newOwnerColors });
             setOwnerColors({ ...newOwnerColors });
           }
         }
@@ -168,15 +166,13 @@ function MetaMaskProvider({ children }) {
         if (!error) {
           const { emperor, conqueredTokenId } = event.returnValues;
           const cityName = document.getElementById(conqueredTokenId).getAttribute('name');
-          if (areAccountsEqual(account, emperor)) {
+          if (areAccountsEqual(window.meta_mask.account, emperor)) {
             toast.success(`${cityName} şehri ile olan savaşınızı kazandınız!`, { toastId: 'wonbattle_success' });
           } else {
             toast.info(`${cityName} şehri uzun süren savaşlara dayanamayarak düştü!`, { toastId: 'wonbattle_info' });
           }
-          const newData = [...cityOwnerList];
-          console.log({ cityOwnerList });
+          const newData = [...window.cityOwnerList];
           newData[conqueredTokenId - 1] = emperor;
-          console.log({ newData });
           setCityOwnerList([...newData]);
         }
       },
@@ -189,7 +185,7 @@ function MetaMaskProvider({ children }) {
         if (!error) {
           const { emperor, defenderTokenId } = event.returnValues;
           const cityName = document.getElementById(defenderTokenId).getAttribute('name');
-          if (areAccountsEqual(account, emperor)) {
+          if (areAccountsEqual(window.meta_mask.account, emperor)) {
             toast.warn(`${cityName} şehri ile olan savaşınızı kaybettiniz!`, { toastId: 'lostbattle_warn' });
           } else {
             toast.info(`${cityName} şehri uzun süren savaştan galip ayrıldı!`, { toastId: 'lostbattle_info' });
@@ -204,7 +200,7 @@ function MetaMaskProvider({ children }) {
       (error, event) => {
         if (!error) {
           const { emperor, defenderTokenId } = event.returnValues;
-          if (areAccountsEqual(account, emperor)) {
+          if (areAccountsEqual(window.meta_mask.account, emperor)) {
             const cityName = document.getElementById(defenderTokenId).getAttribute('name');
             toast.info(`${cityName} şehrinde askerleriniz orduya katıldı!`, { toastId: 'claimsoldier_info' });
           }
@@ -223,7 +219,6 @@ function MetaMaskProvider({ children }) {
   useEffect(() => {
     if (isMetaMaskInstalled) {
       if (initflag) {
-        console.log('--init useEffect--');
         LoadingHelper.ShowLoading();
         setInıtFlag(false);
         initMetaMask();
@@ -241,7 +236,9 @@ function MetaMaskProvider({ children }) {
           });
 
           setCityOwnerList(newCityOwners.map(m => m.toLowerCase()));
+          window.cityOwnerList = newCityOwners.map(m => m.toLowerCase());
           setOwnerColors(newOwnerColors);
+          window.ownerColors = newOwnerColors;
           LoadingHelper.HideLoading();
         };
         fetchData();
