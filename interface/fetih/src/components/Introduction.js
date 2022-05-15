@@ -1,5 +1,5 @@
-import React from "react";
-import { Container } from "react-bootstrap";
+import React from 'react';
+import { Container } from 'react-bootstrap';
 
 function Introduction() {
   return (
@@ -17,7 +17,7 @@ function Introduction() {
                 <br />
                 <h2>Fetih Nedir?</h2>
                 <p className="fs-4">
-                  Yeni topraklar fethetmeyi, şans ve savaş stratejinizi
+                &emsp;Yeni topraklar fethetmeyi, şans ve savaş stratejinizi
                   deneyimi yaşamak istiyorsanız, Fetih: aradığınız uzun soluklu
                   oyun olabilir. Artık ülkenizi korumak ve geliştirmek tamamen
                   sizin elinizde olacak. Soluksuz bir maceraya başlayacaksınız.
@@ -51,7 +51,7 @@ function Introduction() {
                 <br />
                 <br />
                 <h2>Oyun Stratejisi</h2>
-                <p className="fs-4" style={{ textAlign: "right" }}>
+                <p className="fs-4" style={{ textAlign: 'right' }}>
                   Artık krallığınızı korumak ve geliştirmek tamamen sizin
                   elinizde. Şehrin üç tane özelliği var; Saldırı Gücü, Savunma
                   Gücü ve Asker Sayısı. Şehrin özelliklerine göre saldırı
@@ -72,10 +72,15 @@ function Introduction() {
                 <br />
                 <br />
                 <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
                 <h2>Kazanç Modeli</h2>
                 <p className="fs-4">
-                  Bir haritadaki tüm bölgeleri fetheden kullanıcı oyun
-                  hazinesindeki tüm değerin %90’nını hakeder.{" "}
+                &emsp;Bir haritadaki tüm bölgeleri fetheden kullanıcı oyun
+                  hazinesindeki tüm değerin %90’nını hakeder.
                 </p>
               </div>
               <div className="col-md-6">

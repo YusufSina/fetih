@@ -24,9 +24,9 @@ function MetaMaskProvider({ children }) {
 
   /** Meta Mask Functions */
   const initMetaMask = () => {
-    ethereum.request({ method: 'eth_chainId' }).then(chainId => {
+    window.ethereum.request({ method: 'eth_chainId' }).then(_chainId => {
       if (window.ethereum.isConnected()) {
-        setChainId(chainId);      
+        setChainId(_chainId);
       }
     });
 
@@ -35,7 +35,6 @@ function MetaMaskProvider({ children }) {
     });
 
     window.ethereum.on('chainChanged', () => {
-      console.log("test reload")
       window.location.reload();
     });
   };
@@ -224,9 +223,8 @@ function MetaMaskProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    if (isMetaMaskInstalled) {      
+    if (isMetaMaskInstalled) {
       if (initflag) {
-        console.log("init flagged!");
         LoadingHelper.ShowLoading();
         setInıtFlag(false);
         initMetaMask();
