@@ -43,10 +43,10 @@ function MetaMaskProvider({ children }) {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     if (accounts.length > 0) {
       setAccount(accounts[0]);
-      window.meta_mask.account = accounts[0];
+      window.meta_mask_account = accounts[0];
     } else {
       setAccount('');
-      window.meta_mask.account = '';
+      window.meta_mask_account = '';
     }
   };
   /** ***************************************** */
@@ -147,7 +147,7 @@ function MetaMaskProvider({ children }) {
         if (!error) {
           const { sender, tokenId } = event.returnValues;
           const cityName = document.getElementById(tokenId).getAttribute('name');
-          if (areAccountsEqual(window.meta_mask.account, sender)) {
+          if (areAccountsEqual(window.meta_mask_account, sender)) {
             toast.success(`${cityName} şehrini satın aldınız!`, { toastId: 'boughtcity_success' });
           } else {
             toast.info(`${cityName} şehri satın alındı!`, { toastId: 'boughtcity_info' });
@@ -172,7 +172,7 @@ function MetaMaskProvider({ children }) {
         if (!error) {
           const { emperor, conqueredTokenId } = event.returnValues;
           const cityName = document.getElementById(conqueredTokenId).getAttribute('name');
-          if (areAccountsEqual(window.meta_mask.account, emperor)) {
+          if (areAccountsEqual(window.meta_mask_account, emperor)) {
             toast.success(`${cityName} şehri ile olan savaşınızı kazandınız!`, { toastId: 'wonbattle_success' });
           } else {
             toast.info(`${cityName} şehri uzun süren savaşlara dayanamayarak düştü!`, { toastId: 'wonbattle_info' });
@@ -191,7 +191,7 @@ function MetaMaskProvider({ children }) {
         if (!error) {
           const { emperor, defenderTokenId } = event.returnValues;
           const cityName = document.getElementById(defenderTokenId).getAttribute('name');
-          if (areAccountsEqual(window.meta_mask.account, emperor)) {
+          if (areAccountsEqual(window.meta_mask_account, emperor)) {
             toast.warn(`${cityName} şehri ile olan savaşınızı kaybettiniz!`, { toastId: 'lostbattle_warn' });
           } else {
             toast.info(`${cityName} şehri uzun süren savaştan galip ayrıldı!`, { toastId: 'lostbattle_info' });
@@ -206,7 +206,7 @@ function MetaMaskProvider({ children }) {
       (error, event) => {
         if (!error) {
           const { emperor, defenderTokenId } = event.returnValues;
-          if (areAccountsEqual(window.meta_mask.account, emperor)) {
+          if (areAccountsEqual(window.meta_mask_account, emperor)) {
             const cityName = document.getElementById(defenderTokenId).getAttribute('name');
             toast.info(`${cityName} şehrinde askerleriniz orduya katıldı!`, { toastId: 'claimsoldier_info' });
           }
