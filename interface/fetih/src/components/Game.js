@@ -57,7 +57,7 @@ function Game() {
     console.log({ ownerColors });
     if (typeof cityOwnerList === 'object' && Object.keys(cityOwnerList).length > 0 && typeof ownerColors === 'object' && Object.keys(ownerColors).length > 0) {
       cityOwnerList.forEach((f, index) => {
-        if (f !== FetihContract.ADDRESS) {
+        if (!areAccountsEqual(f, FetihContract.ADDRESS)) {
           document
             .getElementById(index + 1)
             .setAttribute('fill', ownerColors[f]);
