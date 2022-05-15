@@ -155,11 +155,13 @@ function MetaMaskProvider({ children }) {
           const newData = [...window.cityOwnerList];
           newData[tokenId - 1] = sender.toLowerCase();
           setCityOwnerList([...newData]);
+          window.cityOwnerList = [...newData];
 
           const newOwnerColors = { ...window.ownerColors };
           if (!newOwnerColors.hasOwnProperty(sender.toLowerCase())) {
             newOwnerColors[sender.toLowerCase()] = RandomColor();
             setOwnerColors({ ...newOwnerColors });
+            window.ownerColors = { ...newOwnerColors };
           }
         }
       },
@@ -180,6 +182,7 @@ function MetaMaskProvider({ children }) {
           const newData = [...window.cityOwnerList];
           newData[conqueredTokenId - 1] = emperor;
           setCityOwnerList([...newData]);
+          window.cityOwnerList = [...newData];
         }
       },
     ).on('error', error => {
