@@ -1,9 +1,11 @@
+/* eslint-disable no-prototype-builtins */
 /* eslint-disable react/jsx-no-constructed-context-values */
 import React, { useEffect, useRef, useState } from 'react';
 import Web3 from 'web3';
 import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import { FetihContract } from '../helpers/Consts';
+import { areAccountsEqual, LoadingHelper, RandomColor } from '../helpers/Utilities';
 
 const MetaMaskContext = React.createContext();
 const MetaMaskConsumer = MetaMaskContext.Consumer;
@@ -12,6 +14,10 @@ function MetaMaskProvider({ children }) {
   const [isMetaMaskInstalled, setIsMetaMaskInstalled] = useState(false);
   const [account, setAccount] = useState('');
   const [chainId, setChainId] = useState('');
+  const [initflag, setInıtFlag] = useState(true);
+  const [cityOwnerList, setCityOwnerList] = useState([]);
+  const [ownerColors, setOwnerColors] = useState();
+
   const contractRef = useRef({});
   const web3Ref = useRef({});
 
@@ -35,6 +41,7 @@ function MetaMaskProvider({ children }) {
     }
   };
   /** ***************************************** */
+
   /* Contract Functions */
   const battle = async (attackerId, defenderId) => {
     await contractRef.current.methods.battle(attackerId, defenderId).send({ from: account });
@@ -124,17 +131,123 @@ function MetaMaskProvider({ children }) {
 
   /** ****************************************** */
 
+  /* Events */
+  const initEvents = () => {
+    contractRef.current.events.BoughtCity(
+      (error, event) => {
+        console.log('BoughtCity');
+        if (!error) {
+          const { sender, tokenId } = event.returnValues;
+          const cityName = document.getElementById(tokenId).getAttribute('name');
+          if (areAccountsEqual(account, sender)) {
+            toast.success(`${cityName} şehrini satın aldınız!`);
+          } else {
+            toast.info(`${cityName} şehri satın alındı!`);
+          }
+          const newData = [...cityOwnerList];
+          console.log({ cityOwnerList });
+          newData[tokenId - 1] = sender.toLowerCase();
+          console.log({ newData });
+          setCityOwnerList([...newData]);
+
+          const newOwnerColors = { ...ownerColors };
+          console.log({ ownerColors });
+          if (!newOwnerColors.hasOwnProperty(sender.toLowerCase())) {
+            newOwnerColors[sender.toLowerCase()] = RandomColor();
+            console.log({ newOwnerColors });
+            setOwnerColors({ ...newOwnerColors });
+          }
+        }
+      },
+    ).on('error', error => {
+      toast.error(error.message);
+    });
+
+    contractRef.current.events.WonBattle(
+      (error, event) => {
+        if (!error) {
+          const { emperor, conqueredTokenId } = event.returnValues;
+          const cityName = document.getElementById(conqueredTokenId).getAttribute('name');
+          if (areAccountsEqual(account, emperor)) {
+            toast.success(`${cityName} şehri ile olan savaşınızı kazandınız!`);
+          } else {
+            toast.info(`${cityName} şehri uzun süren savaşlara dayanamayarak düştü!`);
+          }
+          const newData = [...cityOwnerList];
+          console.log({ cityOwnerList });
+          newData[conqueredTokenId - 1] = emperor;
+          console.log({ newData });
+          setCityOwnerList([...newData]);
+        }
+      },
+    ).on('error', error => {
+      toast.error(error.message);
+    });
+
+    contractRef.current.events.LostBattle(
+      (error, event) => {
+        if (!error) {
+          const { emperor, defenderTokenId } = event.returnValues;
+          const cityName = document.getElementById(defenderTokenId).getAttribute('name');
+          if (areAccountsEqual(account, emperor)) {
+            toast.warn(`${cityName} şehri ile olan savaşınızı kaybettiniz!`);
+          } else {
+            toast.info(`${cityName} şehri uzun süren savaştan galip ayrıldı!`);
+          }
+        }
+      },
+    ).on('error', error => {
+      toast.error(error.message);
+    });
+
+    contractRef.current.events.ClaimSoldier(
+      (error, event) => {
+        if (!error) {
+          const { emperor, defenderTokenId } = event.returnValues;
+          if (areAccountsEqual(account, emperor)) {
+            const cityName = document.getElementById(defenderTokenId).getAttribute('name');
+            toast.info(`${cityName} şehrinde askerleriniz orduya katıldı!`);
+          }
+        }
+      },
+    ).on('error', error => {
+      toast.error(error.message);
+    });
+  };
+  /** ****************************************** */
+
   useEffect(() => {
     setIsMetaMaskInstalled(window.ethereum !== undefined);
   }, []);
 
   useEffect(() => {
     if (isMetaMaskInstalled) {
-      initMetaMask();
-      web3Ref.current = new Web3(window.ethereum);
-      contractRef.current = new web3Ref.current.eth.Contract(FetihContract.ABI, FetihContract.ADDRESS);
+      if (initflag) {
+        console.log('--init useEffect--');
+        LoadingHelper.ShowLoading();
+        setInıtFlag(false);
+        initMetaMask();
+        web3Ref.current = new Web3(window.ethereum);
+        contractRef.current = new web3Ref.current.eth.Contract(FetihContract.ABI, FetihContract.ADDRESS);
+        initEvents();
+        const fetchData = async () => {
+          const newCityOwners = await cityOwners();
+          const newOwnerColors = {};
+
+          newCityOwners.map(m => m.toLowerCase()).forEach(e => {
+            if (!areAccountsEqual(e, FetihContract.ADDRESS) && !newOwnerColors.hasOwnProperty(e)) {
+              newOwnerColors[e] = RandomColor();
+            }
+          });
+
+          setCityOwnerList(newCityOwners.map(m => m.toLowerCase()));
+          setOwnerColors(newOwnerColors);
+          LoadingHelper.HideLoading();
+        };
+        fetchData();
+      }
     }
-  }, [isMetaMaskInstalled]);
+  }, [isMetaMaskInstalled, initflag]);
 
   return (
     <MetaMaskContext.Provider
@@ -152,6 +265,8 @@ function MetaMaskProvider({ children }) {
         cityOwners,
         isSoldiersClaimable,
         claimSoldiers,
+        cityOwnerList,
+        ownerColors,
       }}
     >
       {children}

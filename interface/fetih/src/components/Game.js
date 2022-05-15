@@ -1,21 +1,20 @@
+/* eslint-disable no-inner-declarations */
 /* eslint-disable no-prototype-builtins */
 import React, { useEffect, useState, useContext } from 'react';
-import { toast } from 'react-toastify';
 import GameFooter from './GameFooter';
 import Map from './Map';
 import RightClickMenu from './RightClickMenu';
 import { MetaMaskContext } from '../context/MetaMaskContext';
-import { areAccountsEqual, LoadingHelper, RandomColor } from '../helpers/Utilities';
+import { areAccountsEqual } from '../helpers/Utilities';
 import { FetihContract, NeighboringProvinces } from '../helpers/Consts';
 
 function Game() {
-  const { cityOwners, contractRef, account } = useContext(MetaMaskContext);
+  const { cityOwnerList, ownerColors, account } = useContext(MetaMaskContext);
 
   const [showRightClickMenu, setShowRightClickMenu] = useState(false);
   const [coordinates, setCoordinates] = useState({ top: 0, left: 0 });
   const [id, setId] = useState(0);
-  const [ownerList, setOwnerList] = useState([]);
-  const [ownerColorList, setOwnerColorList] = useState();
+  const [initFlag, setInıtFlag] = useState(false);
 
   const getAttackableCities = _ownerList => {
     if (id === 0) return [];
@@ -26,118 +25,46 @@ function Game() {
   };
 
   useEffect(() => {
-    document.oncontextmenu = e => {
-      if (e.target.tagName === 'path') {
-        e.preventDefault();
-        setShowRightClickMenu(true);
-        setCoordinates({ top: e.clientY + window.scrollY, left: e.clientX });
-        setId(parseInt(e.target.id, 10));
-      }
-    };
+    if (!initFlag) {
+      setInıtFlag(true);
+      console.log('--init Game useEffect--');
+      document.oncontextmenu = e => {
+        if (e.target.tagName === 'path') {
+          e.preventDefault();
+          setShowRightClickMenu(true);
+          setCoordinates({ top: e.clientY + window.scrollY, left: e.clientX });
+          setId(parseInt(e.target.id, 10));
+        }
+      };
 
-    window.addEventListener('click', e => {
-      if (e.target.getAttribute('id') !== 'attack-btn-drp') {
-        setShowRightClickMenu(false);
-      }
-    });
-
-    document.addEventListener('keydown', event => {
-      if (event.key === 'Escape') {
-        setShowRightClickMenu(false);
-      }
-    });
-
-    async function fetchData() {
-      LoadingHelper.ShowLoading();
-
-      const owners = await cityOwners();
-      const ownerColors = {};
-
-      owners.forEach(e => {
-        if (e !== FetihContract.ADDRESS && !ownerColors.hasOwnProperty(e)) {
-          ownerColors[e] = RandomColor();
+      window.addEventListener('click', e => {
+        if (e.target.getAttribute('id') !== 'attack-btn-drp') {
+          setShowRightClickMenu(false);
         }
       });
 
-      setOwnerList(owners);
-      setOwnerColorList(ownerColors);
-
-      LoadingHelper.HideLoading();
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+          setShowRightClickMenu(false);
+        }
+      });
     }
-    fetchData();
-
-    //* ************** Event Listeners ********************** */
-
-    contractRef.current.events.BoughtCity(
-      (error, event) => {
-        if (!error) {
-          const { tokenId, sender } = event.returnValues;
-          setOwnerList(prev => {
-            const newValue = [...prev];
-            newValue[tokenId] = sender;
-            return [...newValue];
-          });
-          toast.success('Şehri Başarı ile satın aldınız!');
-        }
-      },
-    ).on('error', error => {
-      toast.error(error.message);
-    });
-
-    contractRef.current.events.WonBattle(
-      (error, event) => {
-        if (!error) {
-          const { emperor, conqueredTokenId } = event.returnValues;
-          setOwnerList(prev => {
-            const newValue = [...prev];
-            newValue[conqueredTokenId] = emperor;
-            return [...newValue];
-          });
-          if (emperor.toLowerCase() === account.toLowerCase()) {
-            toast.success('Son Yaptığınız Savaşı Kazandınız!');
-          }
-        }
-      },
-    ).on('error', error => {
-      toast.error(error.message);
-    });
-
-    contractRef.current.events.LostBattle(
-      (error, event) => {
-        if (!error) {
-          if (event.returnValues[0].toLowerCase() === account.toLowerCase()) {
-            toast.success('Son Yaptığınız Savaşı Kaybettiniz!');
-          }
-        }
-      },
-    ).on('error', error => {
-      toast.error(error.message);
-    });
-
-    contractRef.current.events.ClaimSoldier(
-      (error, event) => {
-        if (!error) {
-          if (event.returnValues[0].toLowerCase() === account.toLowerCase()) {
-            toast.warning('Askerleriniz Hazır!');
-          }
-        }
-      },
-    ).on('error', error => {
-      toast.error(error.message);
-    });
-  }, []);
+  }, [initFlag]);
 
   useEffect(() => {
-    if (typeof ownerList === 'object' && Object.keys(ownerList).length > 0 && typeof ownerColorList === 'object' && Object.keys(ownerColorList).length > 0) {
-      ownerList.forEach((f, index) => {
+    console.log('useEffect');
+    console.log({ cityOwnerList });
+    console.log({ ownerColors });
+    if (typeof cityOwnerList === 'object' && Object.keys(cityOwnerList).length > 0 && typeof ownerColors === 'object' && Object.keys(ownerColors).length > 0) {
+      cityOwnerList.forEach((f, index) => {
         if (f !== FetihContract.ADDRESS) {
           document
             .getElementById(index + 1)
-            .setAttribute('fill', ownerColorList[f]);
+            .setAttribute('fill', ownerColors[f]);
         }
       });
     }
-  }, [ownerList, ownerColorList]);
+  }, [cityOwnerList, ownerColors]);
 
   return (
     <>
@@ -147,9 +74,9 @@ function Game() {
         top={coordinates.top}
         left={coordinates.left}
         show={showRightClickMenu}
-        isCityEmpty={ownerList[id - 1] === FetihContract.ADDRESS}
-        attackAbleCities={getAttackableCities(ownerList)}
-        isCityMine={areAccountsEqual(ownerList[id - 1], account)}
+        isCityEmpty={cityOwnerList[id - 1] === FetihContract.ADDRESS}
+        attackAbleCities={getAttackableCities(cityOwnerList)}
+        isCityMine={areAccountsEqual(cityOwnerList[id - 1], account)}
       />
       <GameFooter />
     </>
