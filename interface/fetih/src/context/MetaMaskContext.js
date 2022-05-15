@@ -140,9 +140,9 @@ function MetaMaskProvider({ children }) {
           const { sender, tokenId } = event.returnValues;
           const cityName = document.getElementById(tokenId).getAttribute('name');
           if (areAccountsEqual(account, sender)) {
-            toast.success(`${cityName} şehrini satın aldınız!`);
+            toast.success(`${cityName} şehrini satın aldınız!`, { toastId: 'boughtcity_success' });
           } else {
-            toast.info(`${cityName} şehri satın alındı!`);
+            toast.info(`${cityName} şehri satın alındı!`, { toastId: 'boughtcity_info' });
           }
           const newData = [...cityOwnerList];
           console.log({ cityOwnerList });
@@ -160,7 +160,7 @@ function MetaMaskProvider({ children }) {
         }
       },
     ).on('error', error => {
-      toast.error(error.message);
+      toast.error(error.message, { toastId: 'boughtcity_error' });
     });
 
     contractRef.current.events.WonBattle(
@@ -169,9 +169,9 @@ function MetaMaskProvider({ children }) {
           const { emperor, conqueredTokenId } = event.returnValues;
           const cityName = document.getElementById(conqueredTokenId).getAttribute('name');
           if (areAccountsEqual(account, emperor)) {
-            toast.success(`${cityName} şehri ile olan savaşınızı kazandınız!`);
+            toast.success(`${cityName} şehri ile olan savaşınızı kazandınız!`, { toastId: 'wonbattle_success' });
           } else {
-            toast.info(`${cityName} şehri uzun süren savaşlara dayanamayarak düştü!`);
+            toast.info(`${cityName} şehri uzun süren savaşlara dayanamayarak düştü!`, { toastId: 'wonbattle_info' });
           }
           const newData = [...cityOwnerList];
           console.log({ cityOwnerList });
@@ -181,7 +181,7 @@ function MetaMaskProvider({ children }) {
         }
       },
     ).on('error', error => {
-      toast.error(error.message);
+      toast.error(error.message, { toastId: 'wonbattle_error' });
     });
 
     contractRef.current.events.LostBattle(
@@ -190,14 +190,14 @@ function MetaMaskProvider({ children }) {
           const { emperor, defenderTokenId } = event.returnValues;
           const cityName = document.getElementById(defenderTokenId).getAttribute('name');
           if (areAccountsEqual(account, emperor)) {
-            toast.warn(`${cityName} şehri ile olan savaşınızı kaybettiniz!`);
+            toast.warn(`${cityName} şehri ile olan savaşınızı kaybettiniz!`, { toastId: 'lostbattle_warn' });
           } else {
-            toast.info(`${cityName} şehri uzun süren savaştan galip ayrıldı!`);
+            toast.info(`${cityName} şehri uzun süren savaştan galip ayrıldı!`, { toastId: 'lostbattle_info' });
           }
         }
       },
     ).on('error', error => {
-      toast.error(error.message);
+      toast.error(error.message, { toastId: 'lostbattle_error' });
     });
 
     contractRef.current.events.ClaimSoldier(
@@ -206,12 +206,12 @@ function MetaMaskProvider({ children }) {
           const { emperor, defenderTokenId } = event.returnValues;
           if (areAccountsEqual(account, emperor)) {
             const cityName = document.getElementById(defenderTokenId).getAttribute('name');
-            toast.info(`${cityName} şehrinde askerleriniz orduya katıldı!`);
+            toast.info(`${cityName} şehrinde askerleriniz orduya katıldı!`, { toastId: 'claimsoldier_info' });
           }
         }
       },
     ).on('error', error => {
-      toast.error(error.message);
+      toast.error(error.message, { toastId: 'claimsoldier_error' });
     });
   };
   /** ****************************************** */
