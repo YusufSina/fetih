@@ -42,3 +42,6 @@ Kontratlar Rinkeby Network üzerinde yayındadır.
 Oracle Client Kontrat: https://rinkeby.etherscan.io/address/0xa82B968B338E8f7eEE1dCB289c8718244B72b412
 
 Fetih Kontrat: https://rinkeby.etherscan.io/address/0xC24b7f6C71ee0d330FB492c9b30f9f08088044F6
+
+UPDATE: 
+Fetih => https://rinkeby.etherscan.io/address/0x1ce28c60fc215d2f668567bcf77f2af7dd9c5b08
